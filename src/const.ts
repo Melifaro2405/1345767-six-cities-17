@@ -13,10 +13,18 @@ export enum AppRoute {
   NotFound = '*',
 }
 
+export enum APIRoute {
+  Offers = '/offers',
+  Favorite = '/favorite',
+  Comments = '/comments',
+  Login = '/login',
+  Logout = '/logout',
+}
+
 export enum AuthStatus {
-  Auth = 'AUTH',
-  No_Auth = 'NO_AUTH',
-  Unknown = 'UNKNOWN',
+  Auth = 'auth',
+  NoAuth = 'no auth',
+  Unknown = 'unknown',
 }
 
 export enum CityTypes {

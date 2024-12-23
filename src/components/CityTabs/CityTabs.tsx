@@ -1,13 +1,13 @@
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { AppRoute, CityTypes, SortTypes } from '../../const.ts';
-import classNames from 'classnames';
 import {
   changeCity,
   changeSortType,
   getOffersByCity,
 } from '../../store/action.ts';
-import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
 
 function CityTabs() {
   const dispatch = useAppDispatch();

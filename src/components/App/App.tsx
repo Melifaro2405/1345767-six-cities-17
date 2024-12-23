@@ -1,37 +1,30 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Layout from '../Layout/Layout.tsx';
 import PrivateRoute from '../PrivateRoute/PrivateRoute.tsx';
-import { Main, Login, Favorites, Offer, PageNotFound } from '../../pages';
+import { Favorites, Login, Main, Offer, PageNotFound } from '../../pages';
 import { AppRoute, AuthStatus } from '../../const.ts';
-import { TOfferById } from '../../types/offers.ts';
-import { useEffect } from 'react';
-import { getAllOffers } from '../../store/action.ts';
-import { useAppDispatch } from '../../hooks';
+import { offerById } from '../../mocks/mockOffers.ts';
+import { useAppSelector } from '../../hooks';
+import Loader from '../Loader/Loader.tsx';
+import HistoryRouter from '../HistoryRouter/HistoryRouter.tsx';
+import browserHistory from '../../browser-history.ts';
 
-type TAppProps = {
-  offerById: TOfferById;
-};
+function App() {
+  const authStatus = useAppSelector((state) => state.authStatus);
+  const isOffersLoading = useAppSelector((state) => state.isOffersLoading);
 
-function App({ offerById }: TAppProps) {
-  const dispatch = useAppDispatch();
-
-  const authStatus = AuthStatus.Auth;
-
-  useEffect(() => {
-    dispatch(getAllOffers());
-  }, [dispatch]);
+  if (authStatus === AuthStatus.Unknown || isOffersLoading) {
+    return <Loader />;
+  }
 
   return (
     <HelmetProvider>
-      <BrowserRouter>
+      <HistoryRouter history={browserHistory}>
         <Routes>
           <Route path={AppRoute.Root} element={<Layout />}>
             <Route index element={<Main />} />
-            <Route
-              path={AppRoute.Login}
-              element={<Login authStatus={authStatus} />}
-            />
+            <Route path={AppRoute.Login} element={<Login />} />
             <Route
               path={AppRoute.Favorites}
               element={
@@ -47,7 +40,7 @@ function App({ offerById }: TAppProps) {
           </Route>
           <Route path={AppRoute.NotFound} element={<PageNotFound />} />
         </Routes>
-      </BrowserRouter>
+      </HistoryRouter>
     </HelmetProvider>
   );
 }

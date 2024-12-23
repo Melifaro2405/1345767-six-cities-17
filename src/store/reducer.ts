@@ -2,40 +2,57 @@ import { createReducer } from '@reduxjs/toolkit';
 import {
   changeCity,
   changeSortType,
-  getAllOffers,
+  loadOffers,
   getOffersByCity,
   sortOffers,
+  requireAuth,
+  setOffersLoadingStatus,
 } from './action.ts';
 import { TOffer } from '../types/offers.ts';
-import { mockOffers } from '../mocks/mockOffers.ts';
-import { CityTypes, SortTypes } from '../const.ts';
+import { AuthStatus, CityTypes, SortTypes } from '../const.ts';
 import { getSortedOffers } from '../utils/getSortedOffers.ts';
+import { getFilteredOffers } from '../utils/getFilteredOffers.ts';
 
-const initialState = {
+type TInitialState = {
+  city: CityTypes;
+  sortType: SortTypes;
+  offers: TOffer[];
+  offersByCity: TOffer[];
+  authStatus: AuthStatus;
+  isOffersLoading: boolean;
+};
+
+const initialState: TInitialState = {
   city: CityTypes.Paris,
   sortType: SortTypes.Popular,
-  offers: [] as TOffer[],
-  offersByCity: [] as TOffer[],
+  offers: [],
+  offersByCity: [],
+  authStatus: AuthStatus.Unknown,
+  isOffersLoading: false,
 };
 
 const reducer = createReducer(initialState, (builder) => {
   builder
+    .addCase(requireAuth, (state, { payload }) => {
+      state.authStatus = payload;
+    })
+    .addCase(loadOffers, (state, { payload }) => {
+      state.offers = payload;
+    })
+    .addCase(setOffersLoadingStatus, (state, { payload }) => {
+      state.isOffersLoading = payload;
+    })
     .addCase(changeCity, (state, { payload }) => {
       state.city = payload;
-    })
-    .addCase(getAllOffers, (state) => {
-      state.offers = mockOffers;
-    })
-    .addCase(getOffersByCity, (state, { payload }) => {
-      state.offersByCity = state.offers.filter(
-        (offer) => offer.city.name === payload,
-      );
     })
     .addCase(changeSortType, (state, { payload }) => {
       state.sortType = payload;
     })
     .addCase(sortOffers, (state) => {
       state.offersByCity = getSortedOffers(state);
+    })
+    .addCase(getOffersByCity, (state, { payload }) => {
+      state.offersByCity = getFilteredOffers(state.offers, payload);
     });
 });
 

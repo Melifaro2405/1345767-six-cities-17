@@ -44,16 +44,14 @@ function Map({ offers, activeOffer, isNearby }: TMapProps) {
     if (map) {
       const markerLayer = layerGroup().addTo(map);
 
-      offers.forEach(({ location, title }) => {
+      offers.forEach(({ location, id }) => {
         const { latitude: lat, longitude: lng } = location;
 
         const marker = new Marker({ lat, lng });
 
         marker
           .setIcon(
-            activeOffer?.title === title
-              ? currentCustomIcon
-              : defaultCustomIcon,
+            activeOffer?.id === id ? currentCustomIcon : defaultCustomIcon,
           )
           .addTo(markerLayer);
       });

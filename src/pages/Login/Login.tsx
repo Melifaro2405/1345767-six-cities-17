@@ -1,20 +1,34 @@
 import { Helmet } from 'react-helmet-async';
-import { AppRoute, AuthStatus } from '../../const.ts';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { TAuthData } from '../../types/auth-data.ts';
+import { useAppDispatch } from '../../hooks';
+import { loginAction } from '../../store/api-actions.ts';
+import {
+  validateEmail,
+  validatePassword,
+} from '../../utils/fields-validation.ts';
 
-type TLoginProps = {
-  authStatus: AuthStatus;
+const initialAuthData: TAuthData = {
+  email: '',
+  password: '',
 };
 
-function Login({ authStatus }: TLoginProps) {
-  const navigate = useNavigate();
+function Login() {
+  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (authStatus === AuthStatus.Auth) {
-      navigate(AppRoute.Root);
-    }
-  }, [authStatus, navigate]);
+  const [authData, setAuthData] = useState<TAuthData>(initialAuthData);
+
+  const handleChangeAuthData = (evt: ChangeEvent<HTMLInputElement>) => {
+    setAuthData({ ...authData, [evt.target.name]: evt.target.value });
+  };
+
+  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    dispatch(loginAction(authData));
+  };
+
+  const isValidAuthData =
+    validateEmail(authData.email) && validatePassword(authData.password);
 
   return (
     <div className="page page--gray page--login">
@@ -25,11 +39,18 @@ function Login({ authStatus }: TLoginProps) {
         <div className="page__login-container container">
           <section className="login">
             <h1 className="login__title">Sign in</h1>
-            <form className="login__form form" action="#" method="post">
+            <form
+              className="login__form form"
+              onSubmit={handleSubmit}
+              action="#"
+              method="post"
+            >
               <div className="login__input-wrapper form__input-wrapper">
                 <label className="visually-hidden">E-mail</label>
                 <input
                   className="login__input form__input"
+                  value={authData.email}
+                  onChange={handleChangeAuthData}
                   type="email"
                   name="email"
                   placeholder="Email"
@@ -40,6 +61,8 @@ function Login({ authStatus }: TLoginProps) {
                 <label className="visually-hidden">Password</label>
                 <input
                   className="login__input form__input"
+                  value={authData.password}
+                  onChange={handleChangeAuthData}
                   type="password"
                   name="password"
                   placeholder="Password"
@@ -49,6 +72,7 @@ function Login({ authStatus }: TLoginProps) {
               <button
                 className="login__submit form__submit button"
                 type="submit"
+                disabled={!isValidAuthData}
               >
                 Sign in
               </button>
