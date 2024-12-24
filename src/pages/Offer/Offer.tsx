@@ -1,14 +1,47 @@
 import { Helmet } from 'react-helmet-async';
-import { TOfferById } from '../../types/offers.ts';
 import OfferById from '../../components/OfferById/OfferById.tsx';
 import OffersList from '../../components/OffersList/OffersList.tsx';
-import { offersNearby } from '../../mocks/mockOffers.ts';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import Loader from '../../components/Loader/Loader.tsx';
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import {
+  fetchOfferByIdAction,
+  fetchOfferCommentsAction,
+  fetchOffersNearbyAction,
+} from '../../store/api-actions.ts';
+import { setOfferById } from '../../store/action.ts';
+import { TOfferById } from '../../types/offers.ts';
 
-type TOfferProps = {
-  offerById: TOfferById;
-};
+function Offer() {
+  const { id } = useParams();
+  const dispatch = useAppDispatch();
 
-function Offer({ offerById }: TOfferProps) {
+  const offerById = useAppSelector((state) => state.offerById);
+  const offersNearby = useAppSelector((state) => state.offersNearby);
+  const isOfferByIdLoading = useAppSelector(
+    (state) => state.isOfferByIdLoading,
+  );
+  const isOffersNearbyLoading = useAppSelector(
+    (state) => state.isOffersNearbyLoading,
+  );
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchOfferByIdAction(id));
+      dispatch(fetchOffersNearbyAction(id));
+      dispatch(fetchOfferCommentsAction(id));
+    }
+
+    return () => {
+      dispatch(setOfferById({} as TOfferById));
+    };
+  }, [dispatch, id]);
+
+  if (!offerById?.id || isOfferByIdLoading || isOffersNearbyLoading) {
+    return <Loader />;
+  }
+
   return (
     <div className="page">
       <Helmet>
@@ -16,7 +49,7 @@ function Offer({ offerById }: TOfferProps) {
       </Helmet>
       <main className="page__main page__main--offer">
         <div className="container">
-          <OfferById offerById={offerById} />
+          <OfferById offerById={offerById} offersNearby={offersNearby} />
           <section className="near-places places">
             <h2 className="near-places__title">
               Other places in the neighbourhood

@@ -1,12 +1,14 @@
 import { Helmet } from 'react-helmet-async';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { TAuthData } from '../../types/auth-data.ts';
-import { useAppDispatch } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { loginAction } from '../../store/api-actions.ts';
 import {
   validateEmail,
   validatePassword,
 } from '../../utils/fields-validation.ts';
+import { AppRoute, AuthStatus } from '../../const.ts';
+import { useNavigate } from 'react-router-dom';
 
 const initialAuthData: TAuthData = {
   email: '',
@@ -15,6 +17,9 @@ const initialAuthData: TAuthData = {
 
 function Login() {
   const dispatch = useAppDispatch();
+  const authStatus = useAppSelector((state) => state.authStatus);
+
+  const navigate = useNavigate();
 
   const [authData, setAuthData] = useState<TAuthData>(initialAuthData);
 
@@ -29,6 +34,12 @@ function Login() {
 
   const isValidAuthData =
     validateEmail(authData.email) && validatePassword(authData.password);
+
+  useEffect(() => {
+    if (authStatus === AuthStatus.Auth) {
+      navigate(AppRoute.Root);
+    }
+  }, [authStatus, navigate]);
 
   return (
     <div className="page page--gray page--login">

@@ -11,3 +11,9 @@ export type TComment = {
   comment: string;
   rating: number;
 };
+
+export type TCommentFormData = {
+  offerId: string;
+  comment: string;
+  rating: string;
+};
