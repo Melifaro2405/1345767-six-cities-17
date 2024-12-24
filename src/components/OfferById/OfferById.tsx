@@ -2,16 +2,16 @@ import { generateUUID } from '../../utils/generateUUID.ts';
 import classNames from 'classnames';
 import Map from '../Map/Map.tsx';
 import { getRatingStyles } from '../../utils/getRatingStyles.ts';
-import { TOfferById } from '../../types/offers.ts';
-import { offersNearby } from '../../mocks/mockOffers.ts';
 import ReviewsList from '../ReviewsList/ReviewsList.tsx';
 import { getNoun } from '../../utils/getNoun.ts';
+import { TOffer, TOfferById } from '../../types/offers.ts';
 
 type TOfferByIdProps = {
   offerById: TOfferById;
+  offersNearby: TOffer[];
 };
 
-function OfferById({ offerById }: TOfferByIdProps) {
+function OfferById({ offerById, offersNearby }: TOfferByIdProps) {
   const {
     images,
     isPremium,

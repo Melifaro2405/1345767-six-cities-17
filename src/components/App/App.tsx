@@ -4,7 +4,6 @@ import Layout from '../Layout/Layout.tsx';
 import PrivateRoute from '../PrivateRoute/PrivateRoute.tsx';
 import { Favorites, Login, Main, Offer, PageNotFound } from '../../pages';
 import { AppRoute, AuthStatus } from '../../const.ts';
-import { offerById } from '../../mocks/mockOffers.ts';
 import { useAppSelector } from '../../hooks';
 import Loader from '../Loader/Loader.tsx';
 import HistoryRouter from '../HistoryRouter/HistoryRouter.tsx';
@@ -33,10 +32,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
-              path={AppRoute.Offer}
-              element={<Offer offerById={offerById} />}
-            />
+            <Route path={AppRoute.Offer} element={<Offer />} />
           </Route>
           <Route path={AppRoute.NotFound} element={<PageNotFound />} />
         </Routes>

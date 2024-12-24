@@ -1,17 +1,11 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { AppRoute, CityTypes, SortTypes } from '../../const.ts';
-import {
-  changeCity,
-  changeSortType,
-  getOffersByCity,
-} from '../../store/action.ts';
+import { changeCity, changeSortType } from '../../store/action.ts';
 
 function CityTabs() {
   const dispatch = useAppDispatch();
-  const city = useAppSelector((state) => state.city);
 
   const activeCity = useAppSelector((state) => state.city);
 
@@ -19,10 +13,6 @@ function CityTabs() {
     dispatch(changeCity(value));
     dispatch(changeSortType(SortTypes.Popular));
   };
-
-  useEffect(() => {
-    dispatch(getOffersByCity(city));
-  }, [city, dispatch]);
 
   return (
     <>

@@ -1,29 +1,45 @@
 import { FormEvent, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import RatingRadioGroup from './RatingRadioGroup.tsx';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { AuthStatus } from '../../const.ts';
+import { TCommentFormData } from '../../types/comments.ts';
+import { fetchSubmitCommentAction } from '../../store/api-actions.ts';
 
-type TFormState = {
-  rating: string;
-  review: string;
-};
+const MinCommentLength = 50;
 
-const initialFormState: TFormState = {
+const initialFormState: TCommentFormData = {
+  offerId: '',
+  comment: '',
   rating: '',
-  review: '',
 };
 
 function CommentForm() {
-  const [formState, setFormState] = useState<TFormState>(initialFormState);
+  const dispatch = useAppDispatch();
+  const { id } = useParams();
+  const authStatus = useAppSelector((state) => state.authStatus);
 
-  const handleChangeFormValue = (value: string, field: 'review' | 'rating') => {
-    setFormState({ ...formState, [field]: value });
+  const [formState, setFormState] =
+    useState<TCommentFormData>(initialFormState);
+
+  const handleChangeFormValue = (
+    value: string,
+    field: 'comment' | 'rating',
+  ) => {
+    setFormState({ ...formState, offerId: id as string, [field]: value });
   };
 
   const handleSubmitForm = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
+    dispatch(fetchSubmitCommentAction(formState));
     setFormState(initialFormState);
   };
 
-  const { rating, review } = formState;
+  const { rating, comment } = formState;
+
+  if (authStatus !== AuthStatus.Auth) {
+    return null;
+  }
 
   return (
     <form
@@ -35,26 +51,27 @@ function CommentForm() {
       <label className="reviews__label form__label" htmlFor="review">
         Your review
       </label>
-      <RatingRadioGroup handleChange={handleChangeFormValue} />
+      <RatingRadioGroup rating={+rating} handleChange={handleChangeFormValue} />
       <textarea
         className="reviews__textarea form__textarea"
-        id="review"
-        name="review"
+        id="comment"
+        name="comment"
         placeholder="Tell how was your stay, what you like and what can be improved"
-        value={review}
-        onChange={(evt) => handleChangeFormValue(evt.target.value, 'review')}
+        value={comment}
+        onChange={(evt) => handleChangeFormValue(evt.target.value, 'comment')}
       />
       <div className="reviews__button-wrapper">
         <p className="reviews__help">
-          To submit review please make sure to set
+          To submit review please make sure to set&nbsp;
           <span className="reviews__star">rating</span> and describe your stay
           with at least
-          <b className="reviews__text-amount">50 characters</b>.
+          <b className="reviews__text-amount"> {MinCommentLength} characters</b>
+          .
         </p>
         <button
           className="reviews__submit form__submit button"
           type="submit"
-          disabled={!rating || !review}
+          disabled={!rating || comment.length < MinCommentLength}
         >
           Submit
         </button>

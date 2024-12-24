@@ -1,24 +1,26 @@
 import { Fragment } from 'react';
 
 type TRatingRadioGroupProps = {
-  handleChange: (value: string, field: 'review' | 'rating') => void;
+  rating: number;
+  handleChange: (value: string, field: 'comment' | 'rating') => void;
 };
 
-function RatingRadioGroup({ handleChange }: TRatingRadioGroupProps) {
+function RatingRadioGroup({ rating, handleChange }: TRatingRadioGroupProps) {
   return (
     <div className="reviews__rating-form form__rating">
-      {[5, 4, 3, 2, 1].map((v) => (
-        <Fragment key={v}>
+      {[5, 4, 3, 2, 1].map((num) => (
+        <Fragment key={num}>
           <input
             className="form__rating-input visually-hidden"
             name="rating"
-            value={v}
-            id={`${v}-stars`}
+            checked={num === rating}
+            value={num}
+            id={`${num}-stars`}
             type="radio"
             onChange={(evt) => handleChange(evt.target.value, 'rating')}
           />
           <label
-            htmlFor={`${v}-stars`}
+            htmlFor={`${num}-stars`}
             className="reviews__rating-label form__rating-label"
             title="perfect"
           >

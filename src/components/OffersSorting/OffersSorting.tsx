@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { changeSortType, sortOffers } from '../../store/action.ts';
+import { changeSortType } from '../../store/action.ts';
 import { SortTypes } from '../../const.ts';
 
 function OffersSorting() {
@@ -13,7 +13,6 @@ function OffersSorting() {
 
   const handleSelectSort = (type: SortTypes) => {
     dispatch(changeSortType(type));
-    dispatch(sortOffers());
     setIsOpen(false);
   };
 
