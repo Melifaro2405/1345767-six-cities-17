@@ -15,5 +15,5 @@ export type TComment = {
 export type TCommentFormData = {
   offerId: string;
   comment: string;
-  rating: string;
+  rating: number;
 };

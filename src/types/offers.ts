@@ -42,3 +42,9 @@ export type TOfferById = Omit<TOffer, 'previewImage'> & {
   images: string[];
   maxAdults: number;
 };
+
+export type TFavoriteStatus = {
+  id: string;
+  status: 1 | 0;
+  isOfferById?: boolean;
+};

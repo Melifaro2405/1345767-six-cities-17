@@ -21,7 +21,7 @@ function OffersList({ offers, setActiveOffer, isNearby }: TOffersListProps) {
           onMouseEnter={() => handleMouseEnter(offer)}
           onMouseLeave={handleMouseLeave}
         >
-          <OfferCard offer={offer} isNearby={isNearby} />
+          <OfferCard offer={offer} isNearbyCard={isNearby} />
         </div>
       ))}
     </>

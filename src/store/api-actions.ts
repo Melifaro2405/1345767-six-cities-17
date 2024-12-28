@@ -2,17 +2,21 @@ import { AxiosInstance } from 'axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { TAppDispatch, TState } from '../types/state.ts';
 import { APIRoute, AppRoute, AuthStatus } from '../const.ts';
-import { TOffer, TOfferById } from '../types/offers.ts';
+import { TFavoriteStatus, TOffer, TOfferById } from '../types/offers.ts';
 import {
-  setOfferById,
+  loadOfferById,
   loadOffers,
   redirectToRoute,
   requireAuth,
   setOfferByIdLoadingStatus,
   setOffersLoadingStatus,
   setOffersNearbyLoadingStatus,
-  setOffersNearby,
+  loadOffersNearby,
   setOfferComments,
+  setFavoriteOffersLoadingStatus,
+  loadFavoriteOffers,
+  loadCurrentOffer,
+  setCurrentOfferLoadingStatus,
 } from './action.ts';
 import { TAuthData } from '../types/auth-data.ts';
 import {
@@ -22,13 +26,13 @@ import {
 import { TUserData } from '../types/user-data.ts';
 import { TComment, TCommentFormData } from '../types/comments.ts';
 
-type TExtraArgs = {
-  dispatch: TAppDispatch;
+const createAppAsyncThunk = createAsyncThunk.withTypes<{
   state: TState;
+  dispatch: TAppDispatch;
   extra: AxiosInstance;
-};
+}>();
 
-export const checkAuthAction = createAsyncThunk<void, undefined, TExtraArgs>(
+export const checkAuthAction = createAppAsyncThunk<void, undefined>(
   'user/checkAuth',
   async (_arg, { dispatch, extra: api }) => {
     try {
@@ -40,7 +44,7 @@ export const checkAuthAction = createAsyncThunk<void, undefined, TExtraArgs>(
   },
 );
 
-export const loginAction = createAsyncThunk<void, TAuthData, TExtraArgs>(
+export const loginAction = createAppAsyncThunk<void, TAuthData>(
   'user/login',
   async ({ email, password }, { dispatch, extra: api }) => {
     const { data } = await api.post<TUserData>(APIRoute.Login, {
@@ -53,7 +57,7 @@ export const loginAction = createAsyncThunk<void, TAuthData, TExtraArgs>(
   },
 );
 
-export const logoutAction = createAsyncThunk<void, undefined, TExtraArgs>(
+export const logoutAction = createAppAsyncThunk<void, undefined>(
   'user/logout',
   async (_arg, { dispatch, extra: api }) => {
     await api.delete(APIRoute.Logout);
@@ -62,7 +66,7 @@ export const logoutAction = createAsyncThunk<void, undefined, TExtraArgs>(
   },
 );
 
-export const fetchOffersAction = createAsyncThunk<void, undefined, TExtraArgs>(
+export const fetchOffers = createAppAsyncThunk<void, undefined>(
   'data/fetchOffers',
   async (_arg, { dispatch, extra: api }) => {
     dispatch(setOffersLoadingStatus(true));
@@ -72,7 +76,7 @@ export const fetchOffersAction = createAsyncThunk<void, undefined, TExtraArgs>(
   },
 );
 
-export const fetchOfferByIdAction = createAsyncThunk<void, string, TExtraArgs>(
+export const fetchOfferByIdAction = createAppAsyncThunk<void, string>(
   'data/fetchOfferById',
   async (id, { dispatch, extra: api }) => {
     dispatch(setOfferByIdLoadingStatus(true));
@@ -80,45 +84,72 @@ export const fetchOfferByIdAction = createAsyncThunk<void, string, TExtraArgs>(
     try {
       const { data } = await api.get<TOfferById>(`${APIRoute.Offers}/${id}`);
       dispatch(setOfferByIdLoadingStatus(false));
-      dispatch(setOfferById(data));
+      dispatch(loadOfferById(data));
     } catch {
       dispatch(redirectToRoute(AppRoute.NotFound));
     }
   },
 );
 
-export const fetchOffersNearbyAction = createAsyncThunk<
-  void,
-  string,
-  TExtraArgs
->('data/fetchNearbyOffers', async (id, { dispatch, extra: api }) => {
-  dispatch(setOffersNearbyLoadingStatus(true));
+export const fetchOffersNearbyAction = createAppAsyncThunk<void, string>(
+  'data/fetchNearbyOffers',
+  async (id, { dispatch, extra: api }) => {
+    dispatch(setOffersNearbyLoadingStatus(true));
 
-  const { data } = await api.get<TOffer[]>(`${APIRoute.Offers}/${id}/nearby`);
-  dispatch(setOffersNearbyLoadingStatus(false));
-  dispatch(setOffersNearby(data));
-});
+    const { data } = await api.get<TOffer[]>(`${APIRoute.Offers}/${id}/nearby`);
+    dispatch(setOffersNearbyLoadingStatus(false));
+    dispatch(loadOffersNearby(data));
+  },
+);
 
-export const fetchOfferCommentsAction = createAsyncThunk<
-  void,
-  string,
-  TExtraArgs
->('comments/fetchOfferComments', async (id, { dispatch, extra: api }) => {
-  const { data } = await api.get<TComment[]>(`${APIRoute.Comments}/${id}`);
-  dispatch(setOfferComments(data));
-});
+export const fetchFavoriteOffersAction = createAppAsyncThunk<void, undefined>(
+  'data/fetchFavoriteOffers',
+  async (_arg, { dispatch, extra: api }) => {
+    dispatch(setFavoriteOffersLoadingStatus(true));
 
-export const fetchSubmitCommentAction = createAsyncThunk<
+    const { data } = await api.get<TOffer[]>(APIRoute.Favorite);
+    dispatch(setFavoriteOffersLoadingStatus(false));
+    dispatch(loadFavoriteOffers(data));
+  },
+);
+
+export const sendFavoriteStatusAction = createAppAsyncThunk<
   void,
-  TCommentFormData,
-  TExtraArgs
+  TFavoriteStatus
 >(
+  'data/fetchFavoriteOffers',
+  async ({ id, status, isOfferById }, { dispatch, extra: api }) => {
+    setCurrentOfferLoadingStatus(true);
+    try {
+      const { data } = await api.post<TOffer>(
+        `${APIRoute.Favorite}/${id}/${status}`,
+      );
+      dispatch(loadCurrentOffer(data));
+      dispatch(fetchFavoriteOffersAction());
+
+      if (isOfferById) {
+        dispatch(fetchOfferByIdAction(id));
+      }
+    } catch {
+      dispatch(redirectToRoute(AppRoute.Login));
+    } finally {
+      setCurrentOfferLoadingStatus(false);
+    }
+  },
+);
+
+export const fetchOfferCommentsAction = createAppAsyncThunk<void, string>(
+  'comments/fetchOfferComments',
+  async (id, { dispatch, extra: api }) => {
+    const { data } = await api.get<TComment[]>(`${APIRoute.Comments}/${id}`);
+    dispatch(setOfferComments(data));
+  },
+);
+
+export const submitCommentAction = createAppAsyncThunk<void, TCommentFormData>(
   'comments/fetchSubmitComment',
-  async ({ offerId, comment, rating }, { dispatch, extra: api }) => {
-    await api.post<TComment[]>(`${APIRoute.Comments}/${offerId}`, {
-      comment,
-      rating: +rating,
-    });
+  async ({ offerId, ...commentData }, { dispatch, extra: api }) => {
+    await api.post<TComment[]>(`${APIRoute.Comments}/${offerId}`, commentData);
     dispatch(fetchOfferCommentsAction(offerId));
   },
 );
