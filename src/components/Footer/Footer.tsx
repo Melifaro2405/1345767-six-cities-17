@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../const.ts';
 
-function FavoritesFooter() {
+function Footer() {
   return (
     <footer className="footer container">
       <Link className="footer__logo-link" to={AppRoute.Root}>
@@ -17,4 +17,4 @@ function FavoritesFooter() {
   );
 }
 
-export default FavoritesFooter;
+export default Footer;

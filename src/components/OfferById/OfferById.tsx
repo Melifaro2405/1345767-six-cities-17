@@ -1,10 +1,11 @@
-import { generateUUID } from '../../utils/generateUUID.ts';
 import classNames from 'classnames';
 import Map from '../Map/Map.tsx';
 import { getRatingStyles } from '../../utils/getRatingStyles.ts';
 import ReviewsList from '../ReviewsList/ReviewsList.tsx';
 import { getNoun } from '../../utils/getNoun.ts';
 import { TOffer, TOfferById } from '../../types/offers.ts';
+import { sendFavoriteStatusAction } from '../../store/api-actions.ts';
+import { useAppDispatch } from '../../hooks';
 
 type TOfferByIdProps = {
   offerById: TOfferById;
@@ -12,7 +13,10 @@ type TOfferByIdProps = {
 };
 
 function OfferById({ offerById, offersNearby }: TOfferByIdProps) {
+  const dispatch = useAppDispatch();
+
   const {
+    id,
     images,
     isPremium,
     title,
@@ -27,12 +31,22 @@ function OfferById({ offerById, offersNearby }: TOfferByIdProps) {
     host: { name, isPro, avatarUrl },
   } = offerById;
 
+  const handleSwitchFavorite = () => {
+    dispatch(
+      sendFavoriteStatusAction({
+        id,
+        status: isFavorite ? 0 : 1,
+        isOfferById: true,
+      }),
+    );
+  };
+
   return (
     <section className="offer">
       <div className="offer__gallery-container container">
         <div className="offer__gallery">
           {images?.slice(0, 6).map((image) => (
-            <div key={generateUUID()} className="offer__image-wrapper">
+            <div key={image} className="offer__image-wrapper">
               <img className="offer__image" src={image} alt="Photo studio" />
             </div>
           ))}
@@ -54,6 +68,7 @@ function OfferById({ offerById, offersNearby }: TOfferByIdProps) {
                 'button',
               )}
               type="button"
+              onClick={handleSwitchFavorite}
             >
               <svg className="offer__bookmark-icon" width="31" height="33">
                 <use xlinkHref="#icon-bookmark"></use>

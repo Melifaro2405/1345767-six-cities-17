@@ -10,7 +10,7 @@ import {
   fetchOfferCommentsAction,
   fetchOffersNearbyAction,
 } from '../../store/api-actions.ts';
-import { setOfferById } from '../../store/action.ts';
+import { loadOfferById } from '../../store/action.ts';
 import { TOfferById } from '../../types/offers.ts';
 
 function Offer() {
@@ -34,7 +34,7 @@ function Offer() {
     }
 
     return () => {
-      dispatch(setOfferById({} as TOfferById));
+      dispatch(loadOfferById({} as TOfferById));
     };
   }, [dispatch, id]);
 

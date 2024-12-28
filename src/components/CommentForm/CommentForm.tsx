@@ -4,14 +4,14 @@ import RatingRadioGroup from './RatingRadioGroup.tsx';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { AuthStatus } from '../../const.ts';
 import { TCommentFormData } from '../../types/comments.ts';
-import { fetchSubmitCommentAction } from '../../store/api-actions.ts';
+import { submitCommentAction } from '../../store/api-actions.ts';
 
 const MinCommentLength = 50;
 
 const initialFormState: TCommentFormData = {
   offerId: '',
   comment: '',
-  rating: '',
+  rating: 0,
 };
 
 function CommentForm() {
@@ -23,7 +23,7 @@ function CommentForm() {
     useState<TCommentFormData>(initialFormState);
 
   const handleChangeFormValue = (
-    value: string,
+    value: string | number,
     field: 'comment' | 'rating',
   ) => {
     setFormState({ ...formState, offerId: id as string, [field]: value });
@@ -31,7 +31,7 @@ function CommentForm() {
 
   const handleSubmitForm = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    dispatch(fetchSubmitCommentAction(formState));
+    dispatch(submitCommentAction(formState));
     setFormState(initialFormState);
   };
 

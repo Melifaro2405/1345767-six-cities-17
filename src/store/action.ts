@@ -12,14 +12,26 @@ export const setOffersLoadingStatus = createAction<boolean>(
   'data/setOffersLoadingStatus',
 );
 
-export const setOfferById = createAction<TOfferById>('data/setOfferById');
+export const loadOfferById = createAction<TOfferById>('data/loadOfferById');
 export const setOfferByIdLoadingStatus = createAction<boolean>(
   'data/setOfferByIdLoadingStatus',
 );
 
-export const setOffersNearby = createAction<TOffer[]>('data/setOffersNearby');
+export const loadOffersNearby = createAction<TOffer[]>('data/loadOffersNearby');
 export const setOffersNearbyLoadingStatus = createAction<boolean>(
   'data/setOffersNearbyLoadingStatus',
+);
+
+export const loadFavoriteOffers = createAction<TOffer[]>(
+  'data/loadFavoriteOffers',
+);
+export const setFavoriteOffersLoadingStatus = createAction<boolean>(
+  'data/setFavoriteOffersLoadingStatus',
+);
+
+export const loadCurrentOffer = createAction<TOffer>('data/loadCurrentOffer');
+export const setCurrentOfferLoadingStatus = createAction<boolean>(
+  'data/setCurrentOfferLoadingStatus',
 );
 
 export const setOfferComments = createAction<TComment[]>(

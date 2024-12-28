@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 
 type TRatingRadioGroupProps = {
   rating: number;
-  handleChange: (value: string, field: 'comment' | 'rating') => void;
+  handleChange: (value: string | number, field: 'comment' | 'rating') => void;
 };
 
 function RatingRadioGroup({ rating, handleChange }: TRatingRadioGroupProps) {
@@ -17,7 +17,7 @@ function RatingRadioGroup({ rating, handleChange }: TRatingRadioGroupProps) {
             value={num}
             id={`${num}-stars`}
             type="radio"
-            onChange={(evt) => handleChange(evt.target.value, 'rating')}
+            onChange={(evt) => handleChange(+evt.target.value, 'rating')}
           />
           <label
             htmlFor={`${num}-stars`}

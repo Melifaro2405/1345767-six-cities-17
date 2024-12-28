@@ -2,21 +2,40 @@ import { TOffer } from '../../types/offers.ts';
 import { getRatingStyles } from '../../utils/getRatingStyles.ts';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
+import { useAppDispatch } from '../../hooks';
+import { sendFavoriteStatusAction } from '../../store/api-actions.ts';
 
 type TOfferCardProps = {
   offer: TOffer;
-  isNearby?: boolean;
+  isNearbyCard?: boolean;
+  isFavoriteCard?: boolean;
 };
 
-function OfferCard({ offer, isNearby }: TOfferCardProps) {
-  const { isPremium, previewImage, price, rating, type, title, isFavorite } =
-    offer;
+function OfferCard({ offer, isNearbyCard, isFavoriteCard }: TOfferCardProps) {
+  const dispatch = useAppDispatch();
+
+  const {
+    id,
+    isPremium,
+    previewImage,
+    price,
+    rating,
+    type,
+    title,
+    isFavorite,
+  } = offer;
+
+  const handleSwitchFavorite = () => {
+    dispatch(sendFavoriteStatusAction({ id, status: isFavorite ? 0 : 1 }));
+  };
 
   return (
     <article
       className={classNames(
-        { 'cities--card': !isNearby },
-        { 'near-places__card': isNearby },
+        { 'cities--card': !isNearbyCard || !isFavoriteCard },
+        { 'near-places__card': isNearbyCard },
+        // eslint-disable-next-line camelcase
+        { favorites__card: isFavoriteCard },
         'place-card',
       )}
     >
@@ -25,18 +44,29 @@ function OfferCard({ offer, isNearby }: TOfferCardProps) {
           <span>Premium</span>
         </div>
       )}
-      <div className="cities__image-wrapper place-card__image-wrapper">
-        <Link to={`/offer/${offer.id}`}>
+      <div
+        className={classNames(
+          { 'cities__image-wrapper': !isFavoriteCard },
+          { 'favorites__image-wrapper': isFavoriteCard },
+          'place-card__image-wrapper',
+        )}
+      >
+        <Link to={`/offer/${id}`}>
           <img
             className="place-card__image"
             src={previewImage}
-            width="260"
-            height="200"
+            width={isFavoriteCard ? '150' : '260'}
+            height={isFavoriteCard ? '110' : '200'}
             alt="Place image"
           />
         </Link>
       </div>
-      <div className="place-card__info">
+      <div
+        className={classNames(
+          { 'favorites__card-info': isFavoriteCard },
+          'place-card__info',
+        )}
+      >
         <div className="place-card__price-wrapper">
           <div className="place-card__price">
             <b className="place-card__price-value">&euro;{price}</b>
@@ -49,6 +79,7 @@ function OfferCard({ offer, isNearby }: TOfferCardProps) {
               'button',
             )}
             type="button"
+            onClick={handleSwitchFavorite}
           >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use xlinkHref="#icon-bookmark"></use>
