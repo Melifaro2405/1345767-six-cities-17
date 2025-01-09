@@ -148,8 +148,11 @@ export const fetchOfferCommentsAction = createAppAsyncThunk<void, string>(
 
 export const submitCommentAction = createAppAsyncThunk<void, TCommentFormData>(
   'comments/fetchSubmitComment',
-  async ({ offerId, ...commentData }, { dispatch, extra: api }) => {
-    await api.post<TComment[]>(`${APIRoute.Comments}/${offerId}`, commentData);
+  async ({ offerId, comment, rating }, { dispatch, extra: api }) => {
+    await api.post<TComment>(`${APIRoute.Comments}/${offerId}`, {
+      comment,
+      rating: +rating,
+    });
     dispatch(fetchOfferCommentsAction(offerId));
   },
 );

@@ -21,10 +21,10 @@ function Header() {
     }
   };
 
-  const userData = getStorageUserData();
+  const { avatarUrl, email } = getStorageUserData();
 
   const avatarStyle = isAuthorized
-    ? { backgroundImage: `url(${userData?.avatarUrl})`, borderRadius: '50%' }
+    ? { backgroundImage: `url(${avatarUrl})`, borderRadius: '50%' }
     : undefined;
 
   const avatarWrapperClass = 'header__avatar-wrapper user__avatar-wrapper';
@@ -59,7 +59,7 @@ function Header() {
                   {isAuthorized && (
                     <>
                       <span className="header__user-name user__name">
-                        {userData?.email}
+                        {email}
                       </span>
                       <span className="header__favorite-count">
                         {favoriteOffersCount}
