@@ -32,7 +32,7 @@ function useMap(
       setMap(instance);
       isRenderedRef.current = true;
     }
-  }, [mapRef, cityLocation, map]);
+  }, [mapRef, cityLocation, map, isNearby]);
 
   return map;
 }

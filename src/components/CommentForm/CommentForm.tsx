@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import RatingRadioGroup from './RatingRadioGroup.tsx';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -23,10 +23,13 @@ function CommentForm() {
     useState<TCommentFormData>(initialFormState);
 
   const handleChangeFormValue = (
-    value: string | number,
-    field: 'comment' | 'rating',
+    evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setFormState({ ...formState, offerId: id as string, [field]: value });
+    setFormState({
+      ...formState,
+      offerId: id as string,
+      [evt.target.name]: evt.target.value,
+    });
   };
 
   const handleSubmitForm = (evt: FormEvent<HTMLFormElement>) => {
@@ -58,7 +61,7 @@ function CommentForm() {
         name="comment"
         placeholder="Tell how was your stay, what you like and what can be improved"
         value={comment}
-        onChange={(evt) => handleChangeFormValue(evt.target.value, 'comment')}
+        onChange={handleChangeFormValue}
       />
       <div className="reviews__button-wrapper">
         <p className="reviews__help">
